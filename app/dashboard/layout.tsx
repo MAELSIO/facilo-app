@@ -32,13 +32,24 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen">
       <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-4">
           <a href="/dashboard" className="flex items-center gap-2 font-display text-lg font-bold">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
               F
             </span>
             Facilo Pro
           </a>
+          {hasAccess && (
+            <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-ink-soft">
+              <a href="/dashboard/clients" className="hover:text-primary">Clients</a>
+              <a href="/dashboard/factures" className="hover:text-primary">Factures</a>
+              <a href="/dashboard/avis" className="hover:text-primary">Avis</a>
+              <a href="/dashboard/devis" className="hover:text-primary">Devis</a>
+              <a href="/dashboard/rendez-vous" className="hover:text-primary">Rendez-vous</a>
+              <a href="/dashboard/aides" className="hover:text-primary">Aides</a>
+              <a href="/dashboard/parametres" className="hover:text-primary">Paramètres</a>
+            </nav>
+          )}
           <span className="text-xs text-ink-faint">{user.email}</span>
         </div>
       </header>

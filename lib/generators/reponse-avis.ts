@@ -29,7 +29,7 @@ export function buildReponse(input: ReponseAvisInput): string {
   const greeting = "Bonjour";
   const sign = input.signataire
     ? `\n${input.signataire} — ${input.commerce}`
-    : `\nL'équipe ${input.commerce}`;
+    : `\nL'équipe de ${input.commerce}`;
 
   if (input.ton === "positif") {
     return (

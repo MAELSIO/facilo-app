@@ -70,6 +70,12 @@ export default async function DashboardLayout({
           </div>
         )}
       </main>
+      <footer className="border-t border-line px-6 py-6 text-center text-xs text-ink-faint">
+        Une question, un souci ?{" "}
+        <a href="mailto:maelsiohan01@gmail.com" className="text-primary hover:underline">
+          maelsiohan01@gmail.com
+        </a>
+      </footer>
     </div>
   );
 }

@@ -151,6 +151,11 @@ export function AidesForm({ initial }: AidesFormProps) {
               {saving ? " · sauvegarde du profil..." : ""}
             </p>
           </div>
+          <p className="mb-3 text-xs text-ink-faint">
+            ⚠️ Sélection indicative et non exhaustive de dispositifs courants, à titre d&apos;exemple —
+            montants, conditions d&apos;éligibilité et disponibilité à vérifier auprès de chaque organisme
+            avant toute démarche.
+          </p>
           <div className="flex flex-col gap-2">
             {result.matches.map((a) => (
               <div key={a.id} className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border border-line bg-surface px-4 py-3">

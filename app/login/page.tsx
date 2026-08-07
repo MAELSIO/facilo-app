@@ -32,7 +32,7 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-[var(--radius-lg)] border border-line bg-surface p-8 shadow-sm">
-        <a href="https://www.facilo.fr" className="mb-6 flex items-center gap-2 font-display text-lg font-bold text-ink">
+        <a href="https://getfacilo.fr" className="mb-6 flex items-center gap-2 font-display text-lg font-bold text-ink">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
             F
           </span>

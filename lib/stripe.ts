@@ -1,5 +1,16 @@
 import Stripe from "stripe";
 
+/** Lit le prix courant d'un item d'abonnement (fallback si absent au niveau item). */
+export function itemCurrentPeriodEnd(
+  subscription: Stripe.Subscription
+): string {
+  const raw =
+    subscription.items.data[0]?.current_period_end ??
+    (subscription as unknown as { current_period_end?: number })
+      .current_period_end;
+  return new Date((raw ?? Math.floor(Date.now() / 1000)) * 1000).toISOString();
+}
+
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-07-29.dahlia",
   typescript: true,

@@ -47,6 +47,7 @@ export default async function DashboardLayout({
               <a href="/dashboard/devis" className="hover:text-primary">Devis</a>
               <a href="/dashboard/rendez-vous" className="hover:text-primary">Rendez-vous</a>
               <a href="/dashboard/aides" className="hover:text-primary">Aides</a>
+              <a href="/dashboard/parrainage" className="hover:text-primary">Parrainage</a>
               <a href="/dashboard/parametres" className="hover:text-primary">Paramètres</a>
             </nav>
           )}

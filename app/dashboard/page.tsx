@@ -1,4 +1,5 @@
 import { PortalButton } from "./checkout-button";
+import { redeemReferral } from "@/lib/actions/referrals";
 
 const TOOLS = [
   { icon: "📄", label: "Relances de factures", href: "/dashboard/factures" },
@@ -9,7 +10,14 @@ const TOOLS = [
   { icon: "👥", label: "Clients", href: "/dashboard/clients" },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>;
+}) {
+  const { ref } = await searchParams;
+  if (ref) await redeemReferral(ref);
+
   return (
     <div>
       <h1 className="mb-2 text-3xl font-bold">Bienvenue sur Facilo Pro</h1>

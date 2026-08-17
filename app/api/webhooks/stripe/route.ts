@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import Stripe from "stripe";
 import { stripe, itemCurrentPeriodEnd, FACILO_PRO_PRICE_ID } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
+import { grantReferralRewardIfDue } from "@/lib/referral-reward";
 
 /**
  * Webhook Stripe. Écoute les events qui font foi pour `subscriptions.status`
@@ -113,10 +114,24 @@ export async function POST(request: NextRequest) {
             : null;
         if (!subscriptionId) break;
 
-        await supabase
+        const { data: sub } = await supabase
           .from("subscriptions")
           .update({ status: "active", updated_at: new Date().toISOString() })
-          .eq("stripe_subscription_id", subscriptionId);
+          .eq("stripe_subscription_id", subscriptionId)
+          .select("user_id, price_id")
+          .maybeSingle();
+
+        // Le filleul devient "réellement payant" ici (facture payée, pas
+        // juste un essai gratuit démarré) — c'est le moment choisi pour
+        // déclencher la récompense de parrainage, jamais avant.
+        if (sub?.user_id && sub.price_id === FACILO_PRO_PRICE_ID && invoice.amount_paid > 0) {
+          await grantReferralRewardIfDue(
+            supabase,
+            sub.user_id,
+            invoice.amount_paid,
+            invoice.currency
+          );
+        }
         break;
       }
 

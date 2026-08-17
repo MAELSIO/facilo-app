@@ -31,36 +31,24 @@ export async function getOrCreateReferralCode(): Promise<string> {
   throw new Error("Impossible de générer un code de parrainage.");
 }
 
-export async function getReferralStats() {
+/** Nombre de filleuls inscrits via `code` (le code du parrain, déjà connu de l'appelant). */
+export async function getReferralStats(code: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: referral } = await supabase
-    .from("referrals")
-    .select("code")
-    .eq("user_id", user.id)
-    .single();
-  if (!referral) return { code: null, count: 0 };
-
   const { count } = await supabase
     .from("referral_redemptions")
     .select("id", { count: "exact", head: true })
-    .eq("code", referral.code);
+    .eq("code", code);
 
-  return { code: referral.code, count: count ?? 0 };
+  return { count: count ?? 0 };
 }
 
 /**
  * Appelé juste après la connexion (première visite du dashboard) si l'URL
  * contenait ?ref=CODE. Enregistre l'attribution du filleul au parrain.
  *
- * Ne crédite AUCUNE récompense pour l'instant — le montant/la durée de
- * l'offre de parrainage doit être validé avant d'être codé en dur (voir
- * rapport de chantier). Une fois validé, créditer ici (service_role
- * requis pour écrire dans subscriptions, RLS l'interdit côté client).
+ * Ne crédite rien ici : la récompense (1 mois offert aux deux) est créditée
+ * plus tard par le webhook Stripe, quand le filleul devient réellement
+ * payant — voir lib/referral-reward.ts (grantReferralRewardIfDue).
  */
 export async function redeemReferral(code: string) {
   const supabase = await createClient();

@@ -20,7 +20,10 @@ export function FactureRow(props: FactureRowProps) {
   const [open, setOpen] = useState(false);
 
   const days = daysLate(new Date(props.echeance));
-  const level = days > 21 ? 3 : days > 7 ? 2 : 1;
+  // Seuils alignés sur le vrai calendrier d'envoi (J+7/J+15/J+30, voir
+  // app/api/cron/send-reminders/route.ts) — l'aperçu affichait "niveau 2"
+  // (ton ferme) jusqu'à J+21 alors que le cron passe au niveau 2 dès J+15.
+  const level = days > 15 ? 3 : days > 7 ? 2 : 1;
 
   const input = {
     artisan: props.entreprise,

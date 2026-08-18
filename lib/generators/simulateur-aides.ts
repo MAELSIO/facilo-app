@@ -143,6 +143,7 @@ export const AIDES_DB: Aide[] = [
 
 export function matchAide(a: Aide, profil: ProfilAide): boolean {
   if (!a.metiers.includes("all") && !a.metiers.includes(profil.metier)) return false;
+  if (!a.regions.includes("all") && !a.regions.includes(profil.region)) return false;
   if (a.ancienneteMax < profil.anciennete) return false;
   if (a.effectifMax < profil.effectif) return false;
   if (!a.projets.includes("all") && !profil.projets.some((p) => a.projets.includes(p))) return false;

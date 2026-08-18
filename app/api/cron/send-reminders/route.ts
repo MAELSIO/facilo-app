@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { resend, FACILO_FROM_EMAIL } from "@/lib/resend";
 import { buildEmail as buildFactureEmail, buildSubject as buildFactureSubject } from "@/lib/generators/relance-facture";
 import { buildEmail as buildRdvEmail } from "@/lib/generators/relance-rdv";
+import { safeCompare } from "@/lib/safe-compare";
 
 export const maxDuration = 60;
 
@@ -17,8 +18,9 @@ export const maxDuration = 60;
  * Authorization avec ce secret quand la variable d'env est configurée.
  */
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const authHeader = request.headers.get("authorization") || "";
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
+  if (!process.env.CRON_SECRET || !safeCompare(authHeader, expected)) {
     return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
   }
 
@@ -115,7 +117,7 @@ async function sendFactureReminder(supabase: any, reminder: { user_id: string; s
     payinfo: facture.infos_paiement ?? undefined,
   };
 
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: FACILO_FROM_EMAIL,
     to: client.email,
     replyTo: authUser?.user?.email,
@@ -123,6 +125,12 @@ async function sendFactureReminder(supabase: any, reminder: { user_id: string; s
     text: buildFactureEmail(input),
   });
 
+  // Le SDK Resend ne lève jamais d'exception sur une erreur API (domaine non
+  // vérifié, adresse invalide, rate-limit) : il faut inspecter `error`
+  // explicitement, sinon un envoi qui échoue reste marqué "envoyé".
+  if (sendError) {
+    return { sent: false, reason: sendError.message || "Échec d'envoi Resend." };
+  }
   return { sent: true };
 }
 
@@ -166,12 +174,15 @@ async function sendRdvReminder(supabase: any, reminder: { user_id: string; sourc
     ton: "formel" as const,
   };
 
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: FACILO_FROM_EMAIL,
     to: client.email,
     subject: `Rappel de rendez-vous — ${dateFormatted}`,
     text: buildRdvEmail(input),
   });
 
+  if (sendError) {
+    return { sent: false, reason: sendError.message || "Échec d'envoi Resend." };
+  }
   return { sent: true };
 }

@@ -19,13 +19,16 @@ export async function POST(request: NextRequest) {
     return withCors(NextResponse.json({ error: "Email invalide." }, { status: 400 }), origin);
   }
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FACILO_FROM_EMAIL,
     to: "maelsiohan01@gmail.com",
     subject: "Nouveau lead Facilo — " + tool,
     html: `<p>Email : ${email}</p><p>Outil : ${tool}</p>`,
   });
 
+  if (error) {
+    return withCors(NextResponse.json({ error: "Échec d'envoi." }, { status: 502 }), origin);
+  }
   return withCors(NextResponse.json({ ok: true }), origin);
 }
 

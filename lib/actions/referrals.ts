@@ -57,14 +57,18 @@ export async function redeemReferral(code: string) {
   } = await supabase.auth.getUser();
   if (!user || !code) return;
 
-  const { data: referral } = await supabase
+  // service_role requis : le filleul cherche le code d'un AUTRE utilisateur
+  // (le parrain), or la policy RLS de `referrals` ne permet de lire que sa
+  // propre ligne (auth.uid() = user_id) — un client RLS-scopé ne trouverait
+  // donc jamais le code d'autrui.
+  const service = createServiceClient();
+
+  const { data: referral } = await service
     .from("referrals")
     .select("user_id")
     .eq("code", code)
     .single();
   if (!referral || referral.user_id === user.id) return;
-
-  const service = createServiceClient();
 
   await service
     .from("referral_redemptions")
